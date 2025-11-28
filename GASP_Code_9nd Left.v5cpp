@@ -1,1 +1,253 @@
-{"mode":"Text","hardwareTarget":"brain","textContent":"#pragma region VEXcode Generated Robot Configuration\n// Make sure all required headers are included.\n#include <stdio.h>\n#include <stdlib.h>\n#include <stdbool.h>\n#include <math.h>\n#include <string.h>\n\n\n#include \"vex.h\"\n\nusing namespace vex;\n\n// Brain should be defined by default\nbrain Brain;\n\n\n// START V5 MACROS\n#define waitUntil(condition)                                                   \\\n  do {                                                                         \\\n    wait(5, msec);                                                             \\\n  } while (!(condition))\n\n#define repeat(iterations)                                                     \\\n  for (int iterator = 0; iterator < iterations; iterator++)\n// END V5 MACROS\n\n\n// Robot configuration code.\nmotor leftDriveMotor1 = motor(PORT1, ratio18_1, true);\n\nmotor leftDriveMotor2 = motor(PORT2, ratio18_1, true);\n\nmotor rightDriveMotor1 = motor(PORT3, ratio18_1, false);\n\nmotor rightDriveMotor2 = motor(PORT4, ratio18_1, false);\n\ncontroller Controller1 = controller(primary);\nmotor bigIntakeMotor1 = motor(PORT6, ratio18_1, true);\n\nmotor bigIntakeMotor2 = motor(PORT7, ratio18_1, false);\n\nmotor smallIntakeMotor = motor(PORT5, ratio18_1, false);\n\n\n\n// generating and setting random seed\nvoid initializeRandomSeed(){\n  int systemTime = Brain.Timer.systemHighResolution();\n  double batteryCurrent = Brain.Battery.current();\n  double batteryVoltage = Brain.Battery.voltage(voltageUnits::mV);\n\n  // Combine these values into a single integer\n  int seed = int(batteryVoltage + batteryCurrent * 100) + systemTime;\n\n  // Set the seed\n  srand(seed);\n}\n\n\n\nvoid vexcodeInit() {\n\n  //Initializing random seed.\n  initializeRandomSeed(); \n}\n\n\n// Helper to make playing sounds from the V5 in VEXcode easier and\n// keeps the code cleaner by making it clear what is happening.\nvoid playVexcodeSound(const char *soundName) {\n  printf(\"VEXPlaySound:%s\\n\", soundName);\n  wait(5, msec);\n}\n\n\n\n// define variable for remote controller enable/disable\nbool RemoteControlCodeEnabled = true;\n\n#pragma endregion VEXcode Generated Robot Configuration\ncompetition Competition;\nbool driveForward = false;\nbool driveBackward = false;\nbool turnLeft = false;\nbool turnRight = false;\nbool intake = false;\nbool output = false;\nvoid robotActions();\nvoid controllerInput();\n\n/*----------------------------------------------------------------------------*/\n/*                                                                            */\n/*    Module:       main.cpp                                                  */\n/*    Author:       {author}                                                  */\n/*    Created:      {date}                                                    */\n/*    Description:  V5 project                                                */\n/*                                                                            */\n/*----------------------------------------------------------------------------*/\n\n\n  \n// Allows for easier use of the VEX Library\nusing namespace vex;\n\n// Function to run when the \"autonomous\" signal is received\nvoid runOnAutonomous() {\n  Brain.Screen.print(\"Running autonomous\");\n\n  leftDriveMotor1.setVelocity(70, percent);\n  leftDriveMotor2.setVelocity(70, percent);\n  rightDriveMotor1.setVelocity(70, percent);\n  rightDriveMotor2.setVelocity(70, percent);\n\n  bigIntakeMotor1.setVelocity(70, percent);\n  bigIntakeMotor2.setVelocity(70, percent);\n  smallIntakeMotor.setVelocity(70, percent);\n\n  leftDriveMotor1.spinFor(forward, 470, degrees, false);\n  leftDriveMotor2.spinFor(forward, 470, degrees, false);\n  rightDriveMotor1.spinFor(forward, 470, degrees, false);\n  rightDriveMotor2.spinFor(forward, 470, degrees, true);\n\n  leftDriveMotor1.spinFor(reverse, 540, degrees, false);\n  leftDriveMotor2.spinFor(reverse, 540, degrees, false);\n  rightDriveMotor1.spinFor(forward, 540, degrees, false);\n  rightDriveMotor2.spinFor(forward, 540, degrees, true);\n\n  leftDriveMotor1.spinFor(forward, 470, degrees, false);\n  leftDriveMotor2.spinFor(forward, 470, degrees, false);\n  rightDriveMotor1.spinFor(forward, 470, degrees, false);\n  rightDriveMotor2.spinFor(forward, 470, degrees, true);\n\n  leftDriveMotor1.spinFor(reverse, 540, degrees, false);\n  leftDriveMotor2.spinFor(reverse, 540, degrees, false);\n  rightDriveMotor1.spinFor(forward, 540, degrees, false);\n  rightDriveMotor2.spinFor(forward, 540, degrees, true);\n  \n  leftDriveMotor1.spinFor(forward, 940, degrees, false);\n  leftDriveMotor2.spinFor(forward, 940, degrees, false);\n  rightDriveMotor1.spinFor(forward, 940, degrees, false);\n  rightDriveMotor2.spinFor(forward, 940, degrees, true);\n\n  bigIntakeMotor1.spinFor(reverse, 1000, degrees, false);\n  bigIntakeMotor2.spinFor(forward, 1000, degrees, false);\n  smallIntakeMotor.spinFor(reverse, 1000, degrees, true);\n\n\n}\n\n// Function to run when the \"driver control\" signal is received\nvoid runOnDriverControl() {\n  Brain.Screen.print(\"Running driver control\");\n  while (true) {\n    controllerInput();\n    robotActions();\n    wait(10, msec);\n  }\n}\n\nint main() {\n  // Register competition event with callback functions.\n  Competition.autonomous(runOnAutonomous);\n  Competition.drivercontrol(runOnDriverControl);\n\n\n  while (true) {\n    // Keep the main program running.\n    wait(0.05, seconds);\n  }\n}\n\nvoid robotActions() {\n  if (driveForward){\n    leftDriveMotor1.spin(forward, 100, percent);\n    leftDriveMotor2.spin(forward, 100, percent);\n    rightDriveMotor1.spin(forward, 100, percent);\n    rightDriveMotor2.spin(forward, 100, percent);\n  } else if (driveBackward) {\n    leftDriveMotor1.spin(reverse, 100, percent);\n    leftDriveMotor2.spin(reverse, 100, percent);\n    rightDriveMotor1.spin(reverse, 100, percent);\n    rightDriveMotor2.spin(reverse, 100, percent);\n  } else if(!turnLeft && !turnRight){\n    leftDriveMotor1.setStopping(brake);\n    leftDriveMotor2.setStopping(brake);\n    rightDriveMotor1.setStopping(brake);\n    rightDriveMotor2.setStopping(brake);\n\n    leftDriveMotor1.stop();\n    leftDriveMotor2.stop();\n    rightDriveMotor1.stop();\n    rightDriveMotor2.stop();\n  }\n  if(turnRight) {\n    leftDriveMotor1.spin(forward, 100, percent);\n    leftDriveMotor2.spin(forward, 100, percent);\n    rightDriveMotor1.spin(reverse, 100, percent);\n    rightDriveMotor2.spin(reverse, 100, percent);\n  } else if(turnLeft){\n    leftDriveMotor1.spin(reverse, 100, percent);\n    leftDriveMotor2.spin(reverse, 100, percent);\n    rightDriveMotor1.spin(forward, 100, percent);\n    rightDriveMotor2.spin(forward, 100, percent);\n  } else if(!driveForward && !driveBackward) {\n    leftDriveMotor1.setStopping(brake);\n    leftDriveMotor2.setStopping(brake);\n    rightDriveMotor1.setStopping(brake);\n    rightDriveMotor2.setStopping(brake);\n\n    leftDriveMotor1.stop();\n    leftDriveMotor2.stop();\n    rightDriveMotor1.stop();\n    rightDriveMotor2.stop();\n  }\n  if(intake){\n\n    bigIntakeMotor1.spin(reverse, 100, percent);\n    bigIntakeMotor2.spin(forward, 100, percent);\n    smallIntakeMotor.spin(reverse, 100, percent);\n  } else if(output){\n    bigIntakeMotor1.spin(reverse, 100, percent);\n    bigIntakeMotor2.spin(reverse, 100, percent);\n    smallIntakeMotor.spin(reverse, 100, percent);\n  } else {\n    bigIntakeMotor1.setStopping(brake);\n    bigIntakeMotor2.setStopping(brake);\n    smallIntakeMotor.setStopping(brake);\n\n    bigIntakeMotor1.stop();\n    bigIntakeMotor2.stop();\n    smallIntakeMotor.stop();\n  }\n}\n\nvoid controllerInput(){\n  int axis3 = Controller1.Axis3.position();\n\n  if (axis3 > 10) {\n      \n      driveForward = true;\n      driveBackward = false;\n  } \n  else if (axis3 < -10) {\n      \n      driveForward = false;\n      driveBackward = true;\n  } \n  else {\n      // neutral\n      driveForward = false;\n      driveBackward = false;\n  }\n  int axis1 = Controller1.Axis1.position();\n\n  if (axis1 < -10) {\n      // turn left\n      turnRight = false;\n      turnLeft = true;\n  } \n  else if (axis1 > 10) {\n      // turn right\n      turnRight = true;\n      turnLeft = false;\n  } \n  else {\n      // neutral\n      turnRight = false;\n      turnLeft = false;\n  }\n  if (Controller1.ButtonR2.pressing()){\n    intake = true;\n    output = false;\n  } \n  else if (Controller1.ButtonR1.pressing()){\n    intake = false;\n    output = true;\n  }\n  else{\n    intake = false;\n    output = false;\n  }\n}","textLanguage":"cpp","robotConfig":[{"port":[1],"name":"leftDriveMotor1","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"true","fwd":"forward","rev":"reverse","gear":"ratio18_1"},"triportSourcePort":22},{"port":[2],"name":"leftDriveMotor2","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"true","fwd":"forward","rev":"reverse","gear":"ratio18_1"},"triportSourcePort":22},{"port":[3],"name":"rightDriveMotor1","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"false","fwd":"forward","rev":"reverse","gear":"ratio18_1"},"triportSourcePort":22},{"port":[4],"name":"rightDriveMotor2","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"false","fwd":"forward","rev":"reverse","gear":"ratio18_1"},"triportSourcePort":22},{"port":[],"name":"Controller1","customName":false,"deviceType":"Controller","deviceClass":"controller","setting":{"left":"","leftDir":"false","right":"","rightDir":"false","upDown":"","upDownDir":"false","xB":"","xBDir":"false","drive":"none","id":"primary"},"triportSourcePort":22},{"port":[6],"name":"bigIntakeMotor1","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"true","fwd":"forward","rev":"reverse","gear":"ratio18_1"},"triportSourcePort":22},{"port":[7],"name":"bigIntakeMotor2","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"false","fwd":"forward","rev":"reverse","gear":"ratio18_1","id":"partner"},"triportSourcePort":22},{"port":[5],"name":"smallIntakeMotor","customName":true,"deviceType":"Motor","deviceClass":"motor","setting":{"reversed":"false","fwd":"forward","rev":"reverse","gear":"ratio18_1","id":"partner"},"triportSourcePort":22}],"slot":1,"platform":"V5","sdkVersion":"20240802.15.00.00","appVersion":"4.62.0","fileFormat":"2.0.0","targetBrainGen":"First","v5Sounds":[{"name":"game over","url":"static/sounds/mixkit-arcade-retro-game-over-213.wav"}],"v5SoundsEnabled":false,"aiVisionSettings":{"colors":[],"codes":[],"tags":true,"AIObjects":true,"AIObjectModel":[],"aiModelDropDownValue":null}}
+#pragma region VEXcode Generated Robot Configuration
+// Make sure all required headers are included.
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
+#include <string.h>
+
+#include "vex.h"
+
+using namespace vex;
+
+// Brain should be defined by default
+brain Brain;
+
+// START V5 MACROS
+#define waitUntil(condition) \
+  do {                       \
+    wait(5, msec);           \
+  } while (!(condition))
+
+#define repeat(iterations) \
+  for (int iterator = 0; iterator < iterations; iterator++)
+// END V5 MACROS
+
+// Robot configuration code.
+motor leftDriveMotor1  = motor(PORT1, ratio18_1, true);
+motor leftDriveMotor2  = motor(PORT2, ratio18_1, true);
+motor rightDriveMotor1 = motor(PORT3, ratio18_1, false);
+motor rightDriveMotor2 = motor(PORT4, ratio18_1, false);
+
+controller Controller1 = controller(primary);
+
+motor bigIntakeMotor1  = motor(PORT6, ratio18_1, true);
+motor bigIntakeMotor2  = motor(PORT7, ratio18_1, false);
+motor smallIntakeMotor = motor(PORT5, ratio18_1, false);
+
+// Generate and set random seed
+void initializeRandomSeed() {
+  int systemTime      = Brain.Timer.systemHighResolution();
+  double batteryCurrent = Brain.Battery.current();
+  double batteryVoltage = Brain.Battery.voltage(voltageUnits::mV);
+
+  // Combine these values into a single integer
+  int seed = int(batteryVoltage + batteryCurrent * 100) + systemTime;
+
+  // Set the seed
+  srand(seed);
+}
+
+void vexcodeInit() {
+  // Initializing random seed.
+  initializeRandomSeed();
+}
+
+// Helper to play VEXcode sound
+void playVexcodeSound(const char *soundName) {
+  printf("VEXPlaySound:%s\n", soundName);
+  wait(5, msec);
+}
+
+// define variable for remote controller enable/disable
+bool RemoteControlCodeEnabled = true;
+
+#pragma endregion VEXcode Generated Robot Configuration
+
+competition Competition;
+
+bool driveForward  = false;
+bool driveBackward = false;
+bool turnLeft      = false;
+bool turnRight     = false;
+bool intake        = false;
+bool output        = false;
+
+void robotActions();
+void controllerInput();
+
+/*----------------------------------------------------------------------------*/
+/*                                  main.cpp                                   */
+/*----------------------------------------------------------------------------*/
+
+using namespace vex;
+
+// Autonomous behavior
+void runOnAutonomous() {
+  Brain.Screen.print("Running autonomous");
+
+  leftDriveMotor1.setVelocity(70, percent);
+  leftDriveMotor2.setVelocity(70, percent);
+  rightDriveMotor1.setVelocity(70, percent);
+  rightDriveMotor2.setVelocity(70, percent);
+
+  bigIntakeMotor1.setVelocity(70, percent);
+  bigIntakeMotor2.setVelocity(70, percent);
+  smallIntakeMotor.setVelocity(70, percent);
+
+  leftDriveMotor1.spinFor(forward, 470, degrees, false);
+  leftDriveMotor2.spinFor(forward, 470, degrees, false);
+  rightDriveMotor1.spinFor(forward, 470, degrees, false);
+  rightDriveMotor2.spinFor(forward, 470, degrees, true);
+
+  leftDriveMotor1.spinFor(reverse, 540, degrees, false);
+  leftDriveMotor2.spinFor(reverse, 540, degrees, false);
+  rightDriveMotor1.spinFor(forward, 540, degrees, false);
+  rightDriveMotor2.spinFor(forward, 540, degrees, true);
+
+  leftDriveMotor1.spinFor(forward, 470, degrees, false);
+  leftDriveMotor2.spinFor(forward, 470, degrees, false);
+  rightDriveMotor1.spinFor(forward, 470, degrees, false);
+  rightDriveMotor2.spinFor(forward, 470, degrees, true);
+
+  leftDriveMotor1.spinFor(reverse, 540, degrees, false);
+  leftDriveMotor2.spinFor(reverse, 540, degrees, false);
+  rightDriveMotor1.spinFor(forward, 540, degrees, false);
+  rightDriveMotor2.spinFor(forward, 540, degrees, true);
+
+  leftDriveMotor1.spinFor(forward, 940, degrees, false);
+  leftDriveMotor2.spinFor(forward, 940, degrees, false);
+  rightDriveMotor1.spinFor(forward, 940, degrees, false);
+  rightDriveMotor2.spinFor(forward, 940, degrees, true);
+
+  bigIntakeMotor1.spinFor(reverse, 1000, degrees, false);
+  bigIntakeMotor2.spinFor(forward, 1000, degrees, false);
+  smallIntakeMotor.spinFor(reverse, 1000, degrees, true);
+}
+
+// Driver control behavior
+void runOnDriverControl() {
+  Brain.Screen.print("Running driver control");
+
+  while (true) {
+    controllerInput();
+    robotActions();
+    wait(10, msec);
+  }
+}
+
+int main() {
+  // Register competition event callbacks
+  Competition.autonomous(runOnAutonomous);
+  Competition.drivercontrol(runOnDriverControl);
+
+  while (true) {
+    wait(0.05, seconds);
+  }
+}
+
+void robotActions() {
+  // Driving forward/backward
+  if (driveForward) {
+    leftDriveMotor1.spin(forward, 100, percent);
+    leftDriveMotor2.spin(forward, 100, percent);
+    rightDriveMotor1.spin(forward, 100, percent);
+    rightDriveMotor2.spin(forward, 100, percent);
+  } 
+  else if (driveBackward) {
+    leftDriveMotor1.spin(reverse, 100, percent);
+    leftDriveMotor2.spin(reverse, 100, percent);
+    rightDriveMotor1.spin(reverse, 100, percent);
+    rightDriveMotor2.spin(reverse, 100, percent);
+  } 
+  else if (!turnLeft && !turnRight) {
+    leftDriveMotor1.stop(brake);
+    leftDriveMotor2.stop(brake);
+    rightDriveMotor1.stop(brake);
+    rightDriveMotor2.stop(brake);
+  }
+
+  // Turning
+  if (turnRight) {
+    leftDriveMotor1.spin(forward, 100, percent);
+    leftDriveMotor2.spin(forward, 100, percent);
+    rightDriveMotor1.spin(reverse, 100, percent);
+    rightDriveMotor2.spin(reverse, 100, percent);
+  } 
+  else if (turnLeft) {
+    leftDriveMotor1.spin(reverse, 100, percent);
+    leftDriveMotor2.spin(reverse, 100, percent);
+    rightDriveMotor1.spin(forward, 100, percent);
+    rightDriveMotor2.spin(forward, 100, percent);
+  } 
+  else if (!driveForward && !driveBackward) {
+    leftDriveMotor1.stop(brake);
+    leftDriveMotor2.stop(brake);
+    rightDriveMotor1.stop(brake);
+    rightDriveMotor2.stop(brake);
+  }
+
+  // Intake system
+  if (intake) {
+    bigIntakeMotor1.spin(reverse, 100, percent);
+    bigIntakeMotor2.spin(forward, 100, percent);
+    smallIntakeMotor.spin(reverse, 100, percent);
+  } 
+  else if (output) {
+    bigIntakeMotor1.spin(reverse, 100, percent);
+    bigIntakeMotor2.spin(reverse, 100, percent);
+    smallIntakeMotor.spin(reverse, 100, percent);
+  } 
+  else {
+    bigIntakeMotor1.stop(brake);
+    bigIntakeMotor2.stop(brake);
+    smallIntakeMotor.stop(brake);
+  }
+}
+
+void controllerInput() {
+  int axis3 = Controller1.Axis3.position();
+  int axis1 = Controller1.Axis1.position();
+
+  // Forward/backward
+  if (axis3 > 10) {
+    driveForward  = true;
+    driveBackward = false;
+  } 
+  else if (axis3 < -10) {
+    driveForward  = false;
+    driveBackward = true;
+  } 
+  else {
+    driveForward  = false;
+    driveBackward = false;
+  }
+
+  // Turning
+  if (axis1 < -10) {
+    turnLeft  = true;
+    turnRight = false;
+  } 
+  else if (axis1 > 10) {
+    turnLeft  = false;
+    turnRight = true;
+  } 
+  else {
+    turnLeft  = false;
+    turnRight = false;
+  }
+
+  // Intake Controls
+  if (Controller1.ButtonR2.pressing()) {
+    intake = true;
+    output = false;
+  } 
+  else if (Controller1.ButtonR1.pressing()) {
+    intake = false;
+    output = true;
+  } 
+  else {
+    intake = false;
+    output = false;
+  }
+}
